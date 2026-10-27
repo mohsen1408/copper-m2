@@ -82,3 +82,32 @@ When a module changes how the app fits together, add a section here:
 **Risks and open questions:** cost, privacy, accuracy or safety risks, and how
 you handle them.
 ```
+
+## Module 2: Ask Copper, the shopping chatbot
+
+**Summary:** a floating chat panel on the landing page that answers price,
+total and stock questions. With **Use tools** on, the model calls four tools
+that read the catalog and the stock list, so it checks instead of guessing;
+with it off, the same question goes to the model with no tools, for the
+tools-on vs. off comparison.
+
+| Piece | Where | What it does |
+|---|---|---|
+| Tools | `lib/copper/assistant/tools.ts` | `get_products`, `get_prices`, `calculate_cost`, `check_availability`. Prices from `lib/copper/catalog.ts`, stock from `readInventory()` (read fresh every call). Zod schemas enforce each tool's input contract |
+| Instructions | `lib/copper/assistant/instructions.ts` | `COPPER_INSTRUCTIONS`, the system prompt, sent only with tools on |
+| Server action | `lib/copper/assistant/ask.ts` | `askCopper({ messages, useTools })` streams through `callStream` (logged to `ai_calls` as module 2, `ask-copper`) and returns a live `Progress`: thinking, tool steps and the reply |
+| Panel | `components/copper/ask-copper.tsx` | Launcher, Sheet, two separate chats (tools on/off), starter questions, composer. Opens from the launcher, the header's `#ask` link, or `/#ask` |
+| Answer view | `components/copper/ask-copper-answer.tsx` | Draws each answer as stations on a rail: tools available, thinking, an open card per tool call (what was sent, what came back), then the reply |
+| Page | `app/page.tsx` | Mounts `<AskCopper aiConfigured={isAiConfigured()} />`; the key itself never reaches the browser |
+
+**Decisions and trade-offs:** `askCopper` returns the live value at once and
+reads the stream in the background, so the panel shows each step as it
+happens. Tools on and off are separate conversations, each sending only its own
+history, so the tools-off model can't copy an answer the tools worked out.
+Tool cards render each tool's output as a labelled list, never raw JSON.
+
+**Risks and open questions:** cost per question grows with tool steps (capped
+at 5 per question). With tools off the model invents prices and stock; the
+panel labels those answers "Answered without tools: may be made up". Without
+`GOOGLE_GENERATIVE_AI_API_KEY` the panel shows the setup card instead of the
+chat.
