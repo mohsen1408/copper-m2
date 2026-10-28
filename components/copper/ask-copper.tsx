@@ -53,6 +53,10 @@ export function AskCopper({ aiConfigured }: { aiConfigured: boolean }) {
   const [chats, setChats] = useState<Chats>({ on: [], off: [] });
   const [draft, setDraft] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
+  // `busy` comes from state, which only updates on the next render, so two
+  // sends in the same moment (a double Enter) would both get past it. A ref
+  // updates at once.
+  const sending = useRef(false);
 
   const key = useTools ? "on" : "off";
   const turns = chats[key];
@@ -85,7 +89,8 @@ export function AskCopper({ aiConfigured }: { aiConfigured: boolean }) {
 
   async function ask(question: string) {
     const text = question.trim();
-    if (!text || busy) return;
+    if (!text || busy || sending.current) return;
+    sending.current = true;
     const chat = key;
     const tools = useTools;
     const messages = [...historyOf(chats[chat]), { role: "user" as const, content: text }];
@@ -110,6 +115,8 @@ export function AskCopper({ aiConfigured }: { aiConfigured: boolean }) {
       for await (const update of readLive(progress)) setProgress(update);
     } catch {
       setProgress(FAILED);
+    } finally {
+      sending.current = false;
     }
   }
 
