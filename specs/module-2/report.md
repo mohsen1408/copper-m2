@@ -22,12 +22,12 @@ Mark each answer ✅ (correct) or ❌ (wrong). Under "Tools used", write which t
 
 | Question | Tools on: right? | Tools used | Cost | Time | Tools off: right? | Cost | Time |
 |---|---|---|---|---|---|---|---|
-| Q1 | | | | | | | |
-| Q2 | | | | | | | |
-| Q3 | | | | | | | |
-| Q4 | | | | | | | |
-| Q5 | | | | | | | |
-| **Total** | **_ / 5** | | | | **_ / 5** | | |
+| Q1 | ✅ | `calculate_cost` | $0.00086 | 6.4 s | ❌ | $0.00418 | 28.7 s |
+| Q2 | ✅ | `get_prices` | $0.00186 | 3.2 s | ❌ | $0.00134 | 2.4 s |
+| Q3 | ✅ | `check_availability` | $0.00090 | 2.1 s | ❌ | $0.00152 | 3.1 s |
+| Q4 | ✅ | `get_products` | $0.00081 | 2.2 s | ❌ | $0.00185 | 3.7 s |
+| Q5 | ✅ | none | $0.00040 | 1.2 s | ❌ | $0.00334 | 5.3 s |
+| **Total** | **5 / 5** | | $0.00483 | | **0 / 5** | $0.01223 | |
 
 ## 2. Reading the steps
 
